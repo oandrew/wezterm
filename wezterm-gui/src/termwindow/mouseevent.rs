@@ -1,6 +1,7 @@
 use crate::tabbar::TabBarItem;
 use crate::termwindow::keyevent::window_mods_to_termwiz_mods;
 use crate::termwindow::{PositionedSplit, ScrollHit, UIItem, UIItemType, TMB};
+use window::Modifiers;
 use ::window::{
     MouseButtons as WMB, MouseCursor, MouseEvent, MouseEventKind as WMEK, MousePress, WindowOps,
 };
@@ -601,7 +602,10 @@ impl super::TermWindow {
             }
         };
 
-        context.set_cursor(Some(if self.current_highlight.is_some() {
+        context.invalidate();
+        
+        
+        context.set_cursor(Some(if self.current_highlight.is_some() && event.modifiers.contains(Modifiers::SUPER) {
             // When hovering over a hyperlink, show an appropriate
             // mouse cursor to give the cue that it is clickable
             MouseCursor::Hand
@@ -610,6 +614,11 @@ impl super::TermWindow {
         } else {
             MouseCursor::Text
         }));
+        // context.set_cursor(Some(if pane.is_mouse_grabbed() {
+        //     MouseCursor::Arrow
+        // } else {
+        //     MouseCursor::Text
+        // }));
 
         let event_trigger_type = match &event.kind {
             WMEK::Press(press) => {

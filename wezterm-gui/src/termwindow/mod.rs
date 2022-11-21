@@ -853,10 +853,12 @@ impl TermWindow {
                 Ok(true)
             }
             WindowEvent::RawKeyEvent(event) => {
+                log::trace!("RawKeyEvent: {:?}", event);
                 self.raw_key_event_impl(event, window);
                 Ok(true)
             }
             WindowEvent::KeyEvent(event) => {
+                log::trace!("KeyEvent: {:?}", event);
                 self.key_event_impl(event, window);
                 Ok(true)
             }

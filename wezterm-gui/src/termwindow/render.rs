@@ -11,6 +11,7 @@ use crate::termwindow::{
     UIItem, UIItemType,
 };
 use crate::utilsprites::RenderMetrics;
+use window::Modifiers;
 use ::window::bitmaps::atlas::OutOfTextureSpace;
 use ::window::bitmaps::{TextureCoord, TextureRect, TextureSize};
 use ::window::glium::uniforms::{
@@ -1569,7 +1570,7 @@ impl super::TermWindow {
         let mut shaped = vec![];
         let mut last_style = None;
         let mut x_pos = 0.;
-
+        log::info!("current_mouse_event: {:?}", &self.current_mouse_event);
         for cluster in cell_clusters {
             if !matches!(last_style.as_ref(), Some(ClusterStyleCache{attrs,..}) if *attrs == &cluster.attrs)
             {
@@ -1579,12 +1580,16 @@ impl super::TermWindow {
                     (Some(ref this), &Some(ref highlight)) => **this == *highlight,
                     _ => false,
                 };
+                let is_super_down = match &self.current_mouse_event {
+                    Some(event) => event.modifiers.contains(Modifiers::SUPER),
+                    None => false,
+                };
                 // underline and strikethrough
                 let underline_tex_rect = gl_state
                     .glyph_cache
                     .borrow_mut()
                     .cached_line_sprite(
-                        is_highlited_hyperlink,
+                        is_highlited_hyperlink && is_super_down,
                         attrs.strikethrough(),
                         attrs.underline(),
                         attrs.overline(),
